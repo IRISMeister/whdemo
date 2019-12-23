@@ -1,0 +1,158 @@
+version: '3.7'
+#
+# $PWD is mounted as a generic /ISC in the container which then has the 
+# /ISC/etc and eventually 
+#
+services:
+  wsdemo:
+    image: dpmeister/irisdemo:wsdemo
+    init: true
+    container_name: wsdemo
+    hostname: wsdemo
+    command: --password-file /run/secrets/password --key /ISC/licsense/iris-docker.key
+    ports:
+    # superserver default port 
+    - "9103:51773"
+    # webserver/management portal port
+    - "9203:52773"
+    environment:
+      TZ: JST-9
+      #LANG: ja_JP.UTF-8
+      # At the moment, enabling Delta cpf removes package mappings. So stop using it.
+      #ISC_DATA_DIRECTORY: /home/irisowner/iris.conf.d 
+      #ISC_CPF_MERGE_FILE: /ISC/docker/cpf/cpf-delta.conf
+    cap_add:
+    - IPC_LOCK
+    networks:
+    - iris-tier
+    volumes:
+      - /host_mnt/c/InterSystems:/ISC
+      #- ./ISC:/ISC
+    secrets:
+      - password
+
+  wshq:
+    depends_on:
+      - wsdc1
+      - wsdc2
+    image: dpmeister/irisdemo:wshq
+    init: true
+    container_name: wshq
+    hostname: wshq
+    command: --password-file /run/secrets/password --key /ISC/licsense/iris-docker.key
+    ports:
+    # superserver default port 
+    - "9104:51773"
+    # webserver/management portal port
+    - "9204:52773"
+    environment:
+      TZ: JST-9
+      #LANG: ja_JP.UTF-8
+      #ISC_DATA_DIRECTORY: /home/irisowner/iris.conf.d 
+      #ISC_CPF_MERGE_FILE: /ISC/docker/cpf/cpf-delta.conf
+    cap_add:
+    - IPC_LOCK
+    networks:
+    - iris-tier
+    volumes:
+      - /host_mnt/c/InterSystems:/ISC
+    secrets:
+      - password
+
+  wsdc1:
+    depends_on:
+      - wsdemo
+    image: dpmeister/irisdemo:wsdc
+    init: true
+    container_name: wsdc1
+    hostname: wsdc1
+    command: --password-file /run/secrets/password --key /ISC/licsense/iris-docker.key
+    ports:
+    # superserver default port 
+    - "9105:51773"
+    # webserver/management portal port
+    - "9205:52773"
+    environment:
+      TZ: JST-9
+      #LANG: ja_JP.UTF-8
+      #ISC_DATA_DIRECTORY: /home/irisowner/iris.conf.d 
+      #ISC_CPF_MERGE_FILE: /ISC/docker/cpf/cpf-delta.conf
+    cap_add:
+    - IPC_LOCK
+    networks:
+    - iris-tier
+    volumes:
+      - /host_mnt/c/InterSystems:/ISC
+    secrets:
+      - password
+
+  wsdc2:
+    depends_on:
+      - wsdemo
+    image: dpmeister/irisdemo:wsdc
+    init: true
+    container_name: wsdc2
+    hostname: wsdc2
+    command: --password-file /run/secrets/password --key /ISC/licsense/iris-docker.key
+    ports:
+    # superserver default port 
+    - "9106:51773"
+    # webserver/management portal port
+    - "9206:52773"
+    environment:
+      TZ: JST-9
+      #LANG: ja_JP.UTF-8
+      #ISC_DATA_DIRECTORY: /home/irisowner/iris.conf.d 
+      #ISC_CPF_MERGE_FILE: /ISC/docker/cpf/cpf-delta.conf
+    cap_add:
+    - IPC_LOCK
+    networks:
+    - iris-tier
+    volumes:
+      - /host_mnt/c/InterSystems:/ISC
+    secrets:
+      - password
+
+  maker:
+    depends_on:
+      - wsdemo
+    image: dpmeister/irisdemo:maker
+    init: true
+    container_name: maker
+    hostname: maker
+    command: --password-file /run/secrets/password --key /ISC/licsense/iris-docker.key
+    ports:
+    # superserver default port 
+    - "9107:51773"
+    # webserver/management portal port
+    - "9207:52773"
+    environment:
+      TZ: JST-9
+      #LANG: ja_JP.UTF-8
+      #ISC_DATA_DIRECTORY: /home/irisowner/iris.conf.d 
+      #ISC_CPF_MERGE_FILE: /ISC/docker/cpf/cpf-delta.conf
+    cap_add:
+    - IPC_LOCK
+    networks:
+    - iris-tier
+    volumes:
+      - /host_mnt/c/InterSystems:/ISC
+    secrets:
+      - password
+
+volumes:
+  external-misc:
+
+secrets:
+  password:
+    # change here depending on your environment
+    file:  /host_mnt/c/temp/password.txt
+    #file:  ./password.txt
+
+networks:
+  iris-tier:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 10.0.1.0/24
