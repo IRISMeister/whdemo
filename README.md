@@ -5,12 +5,12 @@ This software is not supported by InterSystems as part of any released product. 
 
 
 # 使用するコンテナイメージ
-下記のイメージを使用する。ビルドは各々、個別のプロジェクトにてbuild.shを実行。
-イメージ名 用途 メモリ設定 
-wsdemo	(環境制御機能)　自動  
-wshq	(本部機能)	自動  
-wsdc	(WH機能)	自動  
-maker	(メーカー機能)	自動  
+下記のイメージを使用する。ビルドは各々、個別のレポジトリにてbuild.shを実行。
+|GitHubレポジトリ名| イメージ名| 用途| メモリ設定| 
+|whdemo-wsdemo| wsdemo	(環境制御機能)|	自動|
+|whdemo-wshq|	wshq|	(本部機能)|	自動|
+|whdemo-wsdc|	wsdc|	(WH機能)|	自動|
+|whdemo-maker| 	maker|	(メーカー機能)|	自動|
 
 下記のIRIS'ユーザが追加される。  
 appuser 
@@ -49,21 +49,21 @@ wshq     /iris-main --password-file ...   Up (healthy)   0.0.0.0:9104->51773/tcp
 ```
 全て(healthy)になるまで時間を要します。
 
-下記のコンテナが作成される。wsdemoを除く各々でプロダクションが開始する。
-コンテナ名 用途 SSポート/WEBポート ネームスペース プロダクション名
-wsdemo	(環境制御機能)  9103/9203  
-wshq	(本部機能)	    9104/9204  WSHQ WSHQ.Production.Production1
-wsdc1	(WH機能)	   9105/9205  WSDC WSDC.Production.Production1
-wsdc2	(WH機能)	   9106/9206  WSDC WSDC.Production.Production1
-maker	(メーカー機能)	9107/9207  MAKER MAKER.Production.Production1
+下記のコンテナが作成される。wsdemoを除く各々でプロダクションが開始する。  
+|コンテナ名| 用途| SSポート/WEBポート| ネームスペース| プロダクション名|
+|wsdemo	|(環境制御機能)  |9103/9203|||  
+|wshq	|(本部機能)	    |9104/9204 |WSHQ| WSHQ.Production.Production1|
+|wsdc1	|(WH機能)	   |9105/9205  |WSDC| WSDC.Production.Production1|
+|wsdc2	|(WH機能)	   |9106/9206  |WSDC| WSDC.Production.Production1|
+|maker	|(メーカー機能)	|9107/9207 | MAKER| MAKER.Production.Production1|
 
-全プロダクションが起動すると、時間経過と共に、各種処理が実行され、関連するデータ(テーブル)が随時更新される。
+全プロダクションが起動すると、時間経過と共に、各種処理が実行され、関連するデータ(テーブル)が随時更新される。  
 例えば、管理ポータル(http://localhost:9204/csp/sys/%25CSP.Portal.Home.zen)でWSHQ(本部)のWSHQ_Data.Inventoryテーブルを見ると、入荷・出荷の実施状況が把握できる。
 
 時間経過は、一日の経過を擬似的に"加速"するために、WSHQで稼動している
 ##class(WSHQ.Service.InitiatePseudoClock).OnCalculateMetrics()
-ビジネスサービスにより進めている。初期設定では、開始日時は2001/1/1で、60秒(CallInterval値)で1日進む。
-下記コマンドで"現在"の日付を取得できる。
+ビジネスサービスにより進めている。  
+初期設定では、開始日時は2001/1/1で、60秒(CallInterval値)で1日進む。下記コマンドで"現在"の日付を取得できる。
 ```
 # docker-compose exec wshq iris session iris -U wshq
 WSHQ> w $ZDATE(##class(Common.Util).GetToday())
@@ -71,13 +71,13 @@ WSHQ> w $ZDATE(##class(Common.Util).GetToday())
 ```
 
 # 状態の確認方法
-起動後の個々のプロダクションの状態確認にはプロダクションモニタが便利です。
+起動後の個々のプロダクションの状態確認にはプロダクションモニタが便利です。  
 http://localhost:9204/csp/wshq/EnsPortal.ProductionMonitor.zen?$NAMESPACE=WSHQ
 
-アプリレベルのイベントは各ネームスペースのイベントログ画面にて確認可能。
+アプリレベルのイベントは各ネームスペースのイベントログ画面にて確認可能。  
 http://localhost:9204/csp/wshq/EnsPortal.EventLog.zen?$NAMESPACE=WSHQ
 
-個々のプロダクションで、Interoperability/モニタ/[アクティビティ] 画面が利用可能。
+個々のプロダクションで、Interoperability/モニタ/[アクティビティ] 画面が利用可能。  
 http://localhost:9204/csp/wshq/EnsPortal.ActivityVolumeAndDuration.zen?$NAMESPACE=WSHQ
 
 
@@ -89,19 +89,23 @@ WSHQにてCubeが利用可能。
 全プロダクション及びIRISインスタンスが停止する。
 ```
 # docker-compose stop
+```
+
+全プロダクションの開始・停止。wsdemoコンテナにて
+```
+WSDEMO> d ##class(Common.Util).StartAll()
 WSDEMO> d ##class(Common.Util).StopAll()
 ```
 
 # リセット方法
-各種テーブルの初期化方法。第2引数に実行環境のHTTPポートを指定。
+各種テーブルの初期化方法。wsdemoコンテナにて
 ```
-WSDEMO> d ##class(Common.Util).ClearAll(,52773)
+WSDEMO> d ##class(Common.Util).ClearAll()
 ```
 
 # 完全削除方法
 ```
 # docker-compose down -v
-WSDEMO> d ##class(Common.Util).RemoveAll()
 ```
 (コンテナ内に存在する)全データベースが削除される。
 クラスやルーチン類も全て削除されるので、修正を施した場合は、注意。
