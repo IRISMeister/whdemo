@@ -3,10 +3,11 @@
 *N O T I C E  
 This software is not supported by InterSystems as part of any released product.  It is supplied by InterSystems as a demo/test tool for a specific product and version.  The user or customer is fully responsible for the maintenance of this software after delivery, and InterSystems shall bear no responsibility nor liabilities for errors or misuse of this software.
 
-
 # 使用するコンテナイメージ
 下記のイメージを使用する。ビルドは各々、個別のレポジトリにてbuild.shを実行。
+
 |GitHubレポジトリ名| イメージ名| 用途| メモリ設定| 
+----|----|----|----
 |whdemo-wsdemo| wsdemo	(環境制御機能)|	自動|
 |whdemo-wshq|	wshq|	(本部機能)|	自動|
 |whdemo-wsdc|	wsdc|	(WH機能)|	自動|
@@ -50,8 +51,10 @@ wshq     /iris-main --password-file ...   Up (healthy)   0.0.0.0:9104->51773/tcp
 全て(healthy)になるまで時間を要します。
 
 下記のコンテナが作成される。wsdemoを除く各々でプロダクションが開始する。  
-|コンテナ名| 用途| SSポート/WEBポート| ネームスペース| プロダクション名|
-|wsdemo	|(環境制御機能)  |9103/9203|||  
+
+|コンテナ名|用途| SSポート/WEBポート| ネームスペース| プロダクション名|
+----|----|----|----|----
+|wsdemo	|(環境制御,ECPサーバ)  |9103/9203|WSDEMO||  
 |wshq	|(本部機能)	    |9104/9204 |WSHQ| WSHQ.Production.Production1|
 |wsdc1	|(WH機能)	   |9105/9205  |WSDC| WSDC.Production.Production1|
 |wsdc2	|(WH機能)	   |9106/9206  |WSDC| WSDC.Production.Production1|
@@ -93,6 +96,7 @@ WSHQにてCubeが利用可能。
 
 全プロダクションの開始・停止。wsdemoコンテナにて
 ```
+# docker-compose exec wsdemo iris session iris -U wsdemo
 WSDEMO> d ##class(Common.Util).StartAll()
 WSDEMO> d ##class(Common.Util).StopAll()
 ```
@@ -100,6 +104,7 @@ WSDEMO> d ##class(Common.Util).StopAll()
 # リセット方法
 各種テーブルの初期化方法。wsdemoコンテナにて
 ```
+# docker-compose exec wsdemo iris session iris -U wsdemo
 WSDEMO> d ##class(Common.Util).ClearAll()
 ```
 
@@ -108,7 +113,7 @@ WSDEMO> d ##class(Common.Util).ClearAll()
 # docker-compose down -v
 ```
 (コンテナ内に存在する)全データベースが削除される。
-クラスやルーチン類も全て削除されるので、修正を施した場合は、注意。
+クラスやルーチン類も全て削除されるので、ポータルやスタジオで修正を施した場合は、注意。
 
 # 処理概要
 ## 主な永続化データ
