@@ -75,9 +75,12 @@ WSHQ> w $ZDATE(##class(Common.Util).GetToday())
 
 # 状態の確認方法
 起動後の個々のプロダクションの状態確認にはプロダクションモニタが便利です。  
-http://localhost:9204/csp/wshq/EnsPortal.ProductionMonitor.zen?$NAMESPACE=WSHQ
+http://localhost:9204/csp/wshq/EnsPortal.ProductionMonitor.zen?$NAMESPACE=WSHQ  
+http://localhost:9205/csp/wsdc/EnsPortal.ProductionMonitor.zen?$NAMESPACE=WSDC  
+http://localhost:9206/csp/wsdc/EnsPortal.ProductionMonitor.zen?$NAMESPACE=WSDC  
+http://localhost:9207/csp/maker/EnsPortal.ProductionMonitor.zen?$NAMESPACE=MAKER
 
-アプリレベルのイベントは各ネームスペースのイベントログ画面にて確認可能。  
+イベント(アプリレベル、Productionレベル)は各ネームスペースのイベントログ画面にて確認可能。  
 http://localhost:9204/csp/wshq/EnsPortal.EventLog.zen?$NAMESPACE=WSHQ
 
 個々のプロダクションで、Interoperability/モニタ/[アクティビティ] 画面が利用可能。  
